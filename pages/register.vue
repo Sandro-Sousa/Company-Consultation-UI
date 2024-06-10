@@ -1,68 +1,55 @@
 <template>
-  <v-container>
-    <v-row class="justify-end">
-      <v-col cols="12">
-        <v-card>
-          <v-card>
-            <v-card-text class="d-flex">
-              <v-card-text class="d-flex justify-start align-center">
-                <v-icon large class="mr-3">mdi-domain</v-icon>
-                Empresas
-              </v-card-text>
-              <v-card-text class="d-flex justify-end align-center">
-                <v-text-field label="Consultar Empresa" v-model="cnpj" append-icon="mdi-magnify" solo
-                  @click:append="searchCompany"></v-text-field>
-              </v-card-text>
-            </v-card-text>
-          </v-card>
-          <v-divider></v-divider>
-        </v-card>
-      </v-col>
-    </v-row>
-  </v-container>
-  <v-container>
-    <v-row>
-      <v-col cols="12">
-        <v-data-table :headers="headers" :items="items" :items-per-page="6" class="elevation-1" :fixed-header="true"
-          :height="tableHeight" :item-key="itemKey">
-          <template v-slot:item="{ item }">
-            <tr>
-              <td>{{ item.result.nome }}</td>
-              <td>{{ item.cnpj }}</td>
-              <td>{{ item.result.situacao }}</td>
-            </tr>
-          </template>
-        </v-data-table>
-      </v-col>
-    </v-row>
-  </v-container>
+  <div>
+    <v-card class="mx-auto pa-12 pb-8 my-6" elevation="8" max-width="448" rounded="lg">
+      <div class="text-center">
+        <h1 class="mb-4">Registrar</h1>
+        <v-divider></v-divider>
+      </div>
+
+      <div class="text-subtitle-1 text-medium-emphasis mt-4">Nome</div>
+      <v-text-field v-model="name" density="compact" placeholder="Nome" prepend-inner-icon="mdi-account-outline"
+        variant="outlined"></v-text-field>
+
+      <div class="text-subtitle-1 text-medium-emphasis mt-4">Email</div>
+      <v-text-field v-model="email" density="compact" placeholder="Endereço de Email"
+        prepend-inner-icon="mdi-email-outline" variant="outlined"></v-text-field>
+
+      <div class="text-subtitle-1 text-medium-emphasis mt-4">Senha</div>
+      <v-text-field v-model="password" :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
+        :type="visible ? 'text' : 'password'" density="compact" placeholder="Digite sua senha"
+        prepend-inner-icon="mdi-lock-outline" variant="outlined"
+        @click:append-inner="visible = !visible"></v-text-field>
+
+      <v-btn class="mb-8" color="blue" size="large" variant="tonal" block @click="register">
+        Registrar
+      </v-btn>
+    </v-card>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import type { EmpresaParsed } from '../interfaces/CompanyData.ts';
-import { useFetchCompany } from '../composables/useFetchCompany';
+import { useRouter } from 'vue-router';
+import { useCreateUser } from '../composables/useFetchCreateUser.ts';
+import { toast } from 'vue3-toastify';
 
-const { getAllCompany, consultCompany } = useFetchCompany();
+const name = ref('');
+const email = ref('');
+const password = ref('');
+const visible = ref(false);
+const { createUserFunc, createUserError, createUserLoading } = useCreateUser();
+const router = useRouter();
 
-const cnpj = ref('');
-const headers = ref([
-  { text: 'Nome', value: 'result.nome' },
-  { text: 'CNPJ', value: 'cnpj' },
-  { text: 'Situação', value: 'result.situacao' },
-]);
-const items = ref<EmpresaParsed[]>([]);
-const itemKey = ref('cnpj');
-
-const searchCompany = async () => {
-  await consultCompany({ cnpj: cnpj.value });
-  await loadAllCompanies();
-};
-
-const loadAllCompanies = async () => {
-  const response = await getAllCompany();
-  if (Array.isArray(response)) {
-    items.value = response;
+const register = async () => {
+  await createUserFunc({ name: name.value, email: email.value, password: password.value });
+  if (!createUserError.value) {
+    localStorage.setItem('email', email.value);
+    router.push('/verify-code');
+  } else {
+    name.value = '';
+    email.value = '';
+    password.value = '';
+    toast.error('Ocorreu um Erro ao criar o usuário');
   }
 };
 </script>

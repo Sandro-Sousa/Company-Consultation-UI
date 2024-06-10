@@ -6,15 +6,15 @@
         <v-divider></v-divider>
       </div>
 
-      <div class="text-subtitle-1 text-medium-emphasis mt-4">Nome</div>
+      <div class="text-subtitle-1 text-medium-emphasis">Nome</div>
       <v-text-field v-model="name" density="compact" placeholder="Nome" prepend-inner-icon="mdi-account-outline"
         variant="outlined"></v-text-field>
 
-      <div class="text-subtitle-1 text-medium-emphasis mt-4">Email</div>
+      <div class="text-subtitle-1 text-medium-emphasis">Email</div>
       <v-text-field v-model="email" density="compact" placeholder="Endereço de Email"
         prepend-inner-icon="mdi-email-outline" variant="outlined"></v-text-field>
 
-      <div class="text-subtitle-1 text-medium-emphasis mt-4">Senha</div>
+      <div class="text-subtitle-1 text-medium-emphasis">Senha</div>
       <v-text-field v-model="password" :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
         :type="visible ? 'text' : 'password'" density="compact" placeholder="Digite sua senha"
         prepend-inner-icon="mdi-lock-outline" variant="outlined"
